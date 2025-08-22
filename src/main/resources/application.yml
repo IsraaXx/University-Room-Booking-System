@@ -1,44 +1,5 @@
-spring:
-  profiles:
-    active: dev
-  application:
-    name: room-booking-system
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.xml
-
-server:
-  port: 8080
-  servlet:
-    context-path: /api
-
 logging:
   level:
     root: INFO
-    com.sprints.room_booking_system: INFO
-    org.springframework.security: INFO
-    org.hibernate.SQL: INFO
-    org.hibernate.type.descriptor.sql.BasicBinder: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: when-authorized
-
-
-app:
-  jwt:
-    secret: "change-me-super-secret-at-least-32-bytes-long-1234567890"
-    expiration-ms: 86400000
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId}] %-5level %logger{36} - %msg%n"
