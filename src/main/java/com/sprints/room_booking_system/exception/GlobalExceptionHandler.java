@@ -1,10 +1,11 @@
-package com.university.booking.exception;
+package com.sprints.room_booking_system.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import com.sprints.room_booking_system.exception.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -27,6 +28,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OverlapException.class)
     public ResponseEntity<Object> handleOverlap(OverlapException ex, WebRequest request) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(BookingConflictException.class)
+    public ResponseEntity<Object> handleBookingConflict(BookingConflictException ex, WebRequest request) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(InvalidBookingDateException.class)
+    public ResponseEntity<Object> handleInvalidBookingDate(InvalidBookingDateException ex, WebRequest request) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(UnauthorizedOperationException.class)
+    public ResponseEntity<Object> handleUnauthorizedOperation(UnauthorizedOperationException ex, WebRequest request) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, request);
     }
 
     @ExceptionHandler(Exception.class)

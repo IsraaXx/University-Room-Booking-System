@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,20 +23,22 @@ public class RoomController {
 
     // Admin: create room
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Room> createRoom(@Valid @RequestBody RoomDto roomDto) {
         Room created = roomService.createRoom(roomDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Admin: update room
-    @PutMapping("/<built-in function id>")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Room> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDto roomDto) {
         Room updated = roomService.updateRoom(id, roomDto);
         return ResponseEntity.ok(updated);
     }
 
     // Get room by id
-    @GetMapping("/<built-in function id>")
+    @GetMapping("/{id}")
     public ResponseEntity<Room> getRoom(@PathVariable("id") Long id) {
         Optional<Room> room = roomService.findById(id);
         return room.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
@@ -48,7 +51,8 @@ public class RoomController {
     }
 
     // Admin: deactivate (soft delete) room
-    @DeleteMapping("/<built-in function id>")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRoom(@PathVariable("id") Long id) {
         roomService.deactivateRoom(id);
         return ResponseEntity.noContent().build();
@@ -56,6 +60,7 @@ public class RoomController {
 
     // Availability check (student/faculty)
     @GetMapping("/availability")
+    @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
     public ResponseEntity<Boolean> isAvailable(
             @RequestParam Long roomId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,

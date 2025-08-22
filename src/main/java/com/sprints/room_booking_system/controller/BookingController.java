@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +22,7 @@ public class BookingController {
 
     // Request a booking
     @PostMapping
+    @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
     public ResponseEntity<Booking> requestBooking(@Valid @RequestBody BookingDto bookingDto,
                                                   @RequestParam Long userId) {
         Booking created = bookingService.createBooking(bookingDto, userId);
@@ -28,7 +30,8 @@ public class BookingController {
     }
 
     // Approve booking (admin)
-    @PatchMapping("/<built-in function id>/approve")
+    @PatchMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Booking> approve(@PathVariable("id") Long bookingId,
                                            @RequestParam Long adminUserId) {
         Booking approved = bookingService.approveBooking(bookingId, adminUserId);
@@ -36,7 +39,8 @@ public class BookingController {
     }
 
     // Reject booking (admin)
-    @PatchMapping("/<built-in function id>/reject")
+    @PatchMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Booking> reject(@PathVariable("id") Long bookingId,
                                           @RequestParam Long adminUserId,
                                           @RequestParam String reason) {
@@ -45,7 +49,8 @@ public class BookingController {
     }
 
     // Cancel booking (requester or admin)
-    @DeleteMapping("/<built-in function id>")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
     public ResponseEntity<Booking> cancel(@PathVariable("id") Long bookingId,
                                           @RequestParam Long userId,
                                           @RequestParam(defaultValue = "false") boolean isAdmin) {
@@ -54,7 +59,8 @@ public class BookingController {
     }
 
     // Booking history
-    @GetMapping("/history/<built-in function id>")
+    @GetMapping("/history/{id}")
+    @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
     public ResponseEntity<List<Object>> history(@PathVariable("id") Long bookingId) {
         List<Object> history = bookingService.getBookingHistory(bookingId);
         return ResponseEntity.ok(history);

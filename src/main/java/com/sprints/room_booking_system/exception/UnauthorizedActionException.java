@@ -1,4 +1,4 @@
-package com.university.booking.exception;
+package com.sprints.room_booking_system.exception;
 
 public class UnauthorizedActionException extends RuntimeException {
     public UnauthorizedActionException(String message) {
