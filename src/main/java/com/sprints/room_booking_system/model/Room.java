@@ -20,6 +20,7 @@ public class Room {
     private Long id;
 
     @NotBlank(message = "Room name is required")
+    @Column(nullable = false)
     private String name;
 
     @Min(value = 1, message = "Room capacity must be at least 1")

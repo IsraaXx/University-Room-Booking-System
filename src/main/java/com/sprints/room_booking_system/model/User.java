@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name="user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name="users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,9 +30,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
 
     @ManyToOne
     @JoinColumn(name = "department_id")

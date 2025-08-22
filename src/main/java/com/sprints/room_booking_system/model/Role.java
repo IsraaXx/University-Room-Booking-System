@@ -22,6 +22,6 @@ public class Role {
     private String name;
 
 
-    @OneToMany(mappedBy = "role")
-    private List<User> users;
+    // Role entity is now deprecated - User entity uses UserRole enum instead
+    // This entity can be removed in future versions
 }
