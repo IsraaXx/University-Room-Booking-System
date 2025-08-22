@@ -52,13 +52,13 @@ public class SecurityConfig {
             .authenticationProvider(daoAuthenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    };
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    }
+    
 
     @Bean
     public AuthenticationProvider daoAuthenticationProvider() {
