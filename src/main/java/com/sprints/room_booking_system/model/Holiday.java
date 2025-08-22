@@ -17,6 +17,9 @@ public class Holiday {
     private Long id;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)

@@ -36,6 +36,7 @@ public class Room {
 
 
     @OneToMany(mappedBy = "room")
+    @ToString.Exclude
     private List<Booking> bookings;
 
     @ManyToMany
@@ -44,5 +45,9 @@ public class Room {
             joinColumns = @JoinColumn(name = "room_id"),
             inverseJoinColumns = @JoinColumn(name = "feature_id")
     )
+    @ToString.Exclude
     private List<RoomFeature> features ;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }

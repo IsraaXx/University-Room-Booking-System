@@ -39,9 +39,13 @@ public class User {
     private Department department;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Booking> bookings ;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<BookingHistory> bookingHistories ;
 
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }

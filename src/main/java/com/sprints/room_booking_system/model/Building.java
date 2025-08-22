@@ -25,5 +25,6 @@ public class Building {
     private String location;
 
     @OneToMany(mappedBy = "building")
+    @ToString.Exclude
     private List<Room> rooms ;
 }
