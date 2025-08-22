@@ -36,3 +36,9 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
+
+app:
+  jwt:
+    secret: "change-me-super-secret-at-least-32-bytes-long-1234567890"
+    expiration-ms: 86400000

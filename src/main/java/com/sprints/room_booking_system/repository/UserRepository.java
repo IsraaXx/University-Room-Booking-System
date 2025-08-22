@@ -12,36 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
-    /**
-     * Find user by email
-     */
     Optional<User> findByEmail(String email);
-    
-    /**
-     * Find users by role
-     */
-    List<User> findByRole(UserRole role);
-    
-    /**
-     * Find users by department
-     */
-    List<User> findByDepartmentId(Long departmentId);
-    
-    /**
-     * Find active users
-     */
+    boolean existsByEmail(String email);
+
     @Query("SELECT u FROM User u WHERE u.isActive = true")
     List<User> findActiveUsers();
-    
-    /**
-     * Find users by role and department
-     */
+
     @Query("SELECT u FROM User u WHERE u.role = :role AND u.department.id = :departmentId")
     List<User> findByRoleAndDepartment(@Param("role") UserRole role, @Param("departmentId") Long departmentId);
-    
-    /**
-     * Check if email exists
-     */
-    boolean existsByEmail(String email);
 }
