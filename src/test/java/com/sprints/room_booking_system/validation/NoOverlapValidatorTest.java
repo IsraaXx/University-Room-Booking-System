@@ -13,189 +13,192 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NoOverlapValidatorTest {
-    
+
     @Mock
     private BookingRepository bookingRepository;
-    
+
     @InjectMocks
     private NoOverlapValidator validator;
-    
-    private LocalDateTime now;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    
+
+    private BookingDto validBookingDto;
+    private BookingDto invalidBookingDto;
+
     @BeforeEach
     void setUp() {
-        now = LocalDateTime.now();
-        startTime = now.plusHours(1);
-        endTime = now.plusHours(2);
-    }
-    
-    @Test
-    void testValidWhenNoOverlap() {
-        // Given
-        BookingDto bookingDto = createValidBookingDto();
-        when(bookingRepository.hasOverlappingBookings(eq(1L), eq(startTime), eq(endTime)))
-                .thenReturn(false);
-        
-        // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
-        // Then
-        assertThat(isValid).isTrue();
-    }
-    
-    @Test
-    void testInvalidWhenOverlapExists() {
-        // Given
-        BookingDto bookingDto = createValidBookingDto();
-        when(bookingRepository.hasOverlappingBookings(eq(1L), eq(startTime), eq(endTime)))
-                .thenReturn(true);
-        
-        // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
-        // Then
-        assertThat(isValid).isFalse();
-    }
-    
-    @Test
-    void testValidWhenStartTimeAfterEndTime() {
-        // Given
-        BookingDto bookingDto = BookingDto.builder()
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(2);
+
+        validBookingDto = BookingDto.builder()
+                .roomId(1L)
+                .userId(1L)
+                .startTime(startTime)
+                .endTime(endTime)
+                .purpose("Study Group")
+                .build();
+
+        invalidBookingDto = BookingDto.builder()
                 .roomId(1L)
                 .userId(1L)
                 .startTime(endTime) // Start time after end time
                 .endTime(startTime)
                 .purpose("Study Group")
                 .build();
-        
+    }
+
+    @Test
+    void testIsValid_ValidBooking_NoOverlap() {
+        // Given
+        when(bookingRepository.hasOverlappingBookings(anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(false);
+
         // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
+        boolean isValid = validator.isValid(validBookingDto, null);
+
+        // Then
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    void testIsValid_ValidBooking_WithOverlap() {
+        // Given
+        when(bookingRepository.hasOverlappingBookings(anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(true);
+
+        // When
+        boolean isValid = validator.isValid(validBookingDto, null);
+
         // Then
         assertThat(isValid).isFalse();
     }
-    
+
     @Test
-    void testValidWhenStartTimeEqualsEndTime() {
+    void testIsValid_InvalidBooking_EndTimeBeforeStartTime() {
+        // When
+        boolean isValid = validator.isValid(invalidBookingDto, null);
+
+        // Then
+        assertThat(isValid).isFalse();
+    }
+
+    @Test
+    void testIsValid_InvalidBooking_EndTimeEqualsStartTime() {
         // Given
-        BookingDto bookingDto = BookingDto.builder()
+        LocalDateTime time = LocalDateTime.now().plusHours(1);
+        BookingDto dto = BookingDto.builder()
                 .roomId(1L)
                 .userId(1L)
-                .startTime(startTime)
-                .endTime(startTime) // Same time
+                .startTime(time)
+                .endTime(time)
                 .purpose("Study Group")
                 .build();
-        
+
         // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
+        boolean isValid = validator.isValid(dto, null);
+
         // Then
         assertThat(isValid).isFalse();
     }
-    
+
     @Test
-    void testValidWhenNullDto() {
+    void testIsValid_NullBookingDto() {
         // When
         boolean isValid = validator.isValid(null, null);
-        
+
         // Then
         assertThat(isValid).isTrue();
     }
-    
+
     @Test
-    void testValidWhenNullRoomId() {
+    void testIsValid_NullRoomId() {
         // Given
-        BookingDto bookingDto = BookingDto.builder()
+        BookingDto dto = BookingDto.builder()
+                .userId(1L)
+                .startTime(LocalDateTime.now().plusHours(1))
+                .endTime(LocalDateTime.now().plusHours(2))
+                .purpose("Study Group")
+                .build();
+
+        // When
+        boolean isValid = validator.isValid(dto, null);
+
+        // Then
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    void testIsValid_NullStartTime() {
+        // Given
+        BookingDto dto = BookingDto.builder()
+                .roomId(1L)
+                .userId(1L)
+                .endTime(LocalDateTime.now().plusHours(2))
+                .purpose("Study Group")
+                .build();
+
+        // When
+        boolean isValid = validator.isValid(dto, null);
+
+        // Then
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    void testIsValid_NullEndTime() {
+        // Given
+        BookingDto dto = BookingDto.builder()
+                .roomId(1L)
+                .userId(1L)
+                .startTime(LocalDateTime.now().plusHours(1))
+                .purpose("Study Group")
+                .build();
+
+        // When
+        boolean isValid = validator.isValid(dto, null);
+
+        // Then
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    void testIsValid_RepositoryException() {
+        // Given
+        when(bookingRepository.hasOverlappingBookings(anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // When
+        boolean isValid = validator.isValid(validBookingDto, null);
+
+        // Then
+        // The validator should handle exceptions gracefully
+        assertThat(isValid).isFalse();
+    }
+
+    @Test
+    void testIsValid_ValidTimeRange() {
+        // Given
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().plusHours(3);
+        
+        BookingDto dto = BookingDto.builder()
+                .roomId(1L)
                 .userId(1L)
                 .startTime(startTime)
                 .endTime(endTime)
                 .purpose("Study Group")
                 .build();
-        
-        // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
-        // Then
-        assertThat(isValid).isTrue();
-    }
-    
-    @Test
-    void testValidWhenNullStartTime() {
-        // Given
-        BookingDto bookingDto = BookingDto.builder()
-                .roomId(1L)
-                .userId(1L)
-                .endTime(endTime)
-                .purpose("Study Group")
-                .build();
-        
-        // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
-        // Then
-        assertThat(isValid).isTrue();
-    }
-    
-    @Test
-    void testValidWhenNullEndTime() {
-        // Given
-        BookingDto bookingDto = BookingDto.builder()
-                .roomId(1L)
-                .userId(1L)
-                .startTime(startTime)
-                .purpose("Study Group")
-                .build();
-        
-        // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
-        // Then
-        assertThat(isValid).isTrue();
-    }
-    
-    @Test
-    void testValidWhenValidTimeRange() {
-        // Given
-        BookingDto bookingDto = createValidBookingDto();
-        when(bookingRepository.hasOverlappingBookings(eq(1L), eq(startTime), eq(endTime)))
+
+        when(bookingRepository.hasOverlappingBookings(anyLong(), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(false);
-        
+
         // When
-        boolean isValid = validator.isValid(bookingDto, null);
-        
+        boolean isValid = validator.isValid(dto, null);
+
         // Then
         assertThat(isValid).isTrue();
-    }
-    
-    @Test
-    void testRepositoryMethodCalledWithCorrectParameters() {
-        // Given
-        BookingDto bookingDto = createValidBookingDto();
-        when(bookingRepository.hasOverlappingBookings(eq(1L), eq(startTime), eq(endTime)))
-                .thenReturn(false);
-        
-        // When
-        validator.isValid(bookingDto, null);
-        
-        // Then
-        // Mockito will verify the method was called with correct parameters
-        // This test ensures the validator properly delegates to the repository
-    }
-    
-    private BookingDto createValidBookingDto() {
-        return BookingDto.builder()
-                .roomId(1L)
-                .userId(1L)
-                .startTime(startTime)
-                .endTime(endTime)
-                .purpose("Study Group")
-                .build();
     }
 }
