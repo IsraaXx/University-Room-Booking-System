@@ -15,6 +15,8 @@ A comprehensive Spring Boot application for managing university room bookings, b
 - **Exception Handling**: Comprehensive error handling with structured JSON responses
 - **Request Logging**: Detailed request/response logging for debugging and monitoring
 - **Testing**: Full test coverage with unit tests, integration tests, and automated test reports
+- **CI/CD Pipeline**: Automated build, test, and quality gates with GitHub Actions
+- **Code Quality**: Static analysis with Checkstyle, SpotBugs, and OWASP security checks
 
 ## 🛠️ Technology Stack
 
@@ -28,7 +30,11 @@ A comprehensive Spring Boot application for managing university room bookings, b
 - **Lombok** - Reduce boilerplate code
 - **JUnit 5** - Modern testing framework
 - **Mockito** - Mocking framework for unit tests
-- **JaCoCo** - Code coverage reporting
+- **JaCoCo** - Code coverage reporting with 55% minimum threshold
+- **GitHub Actions** - CI/CD pipeline for automated builds and quality gates
+- **Checkstyle** - Code style and quality enforcement
+- **SpotBugs** - Static analysis for bug detection
+- **OWASP Dependency Check** - Security vulnerability scanning
 
 ## 📋 Prerequisites
 
@@ -163,19 +169,22 @@ export SERVER_PORT=8080
 # Run tests with coverage report
 ./mvnw clean test jacoco:report
 
+# Run full verification with quality checks
+./mvnw clean verify
+
 # View coverage report
 open target/site/jacoco/index.html
 ```
 
 ### Test Coverage
 
-The project maintains comprehensive test coverage:
+The project maintains comprehensive test coverage with automated quality gates:
 
-- **Overall Coverage**: 67% (637 of 1,931 instructions)
-- **Branch Coverage**: 75% (26 of 106 branches)
-- **Line Coverage**: 64% (148 of 415 lines)
-- **Method Coverage**: 56% (52 of 118 methods)
-- **Class Coverage**: 70% (8 of 27 classes)
+- **Line Coverage**: 55% minimum (current: exceeding threshold)
+- **Branch Coverage**: 70% minimum (current: exceeding threshold)
+- **Total Tests**: 134 tests with 100% pass rate
+- **Code Quality**: All Checkstyle and SpotBugs checks passing
+- **Security**: OWASP dependency checks with CVSS 7+ threshold
 
 ### Test Structure
 
@@ -219,7 +228,8 @@ src/test/java/
 - **Epic 6: Web Layer** ✅ - Complete REST API with controllers, DTOs, and proper HTTP responses
 - **Epic 7: Security & JWT** ✅ - Spring Security with role-based access control and JWT authentication
 - **Epic 8: Exception Handling & Logging** ✅ - Global exception handler, custom exceptions, and request logging
-- **Epic 9: Testing** ✅ - Comprehensive testing suite with 100% test coverage
+- **Epic 9: Testing** ✅ - Comprehensive testing suite with 134 tests and automated coverage reporting
+- **Epic 10: CI/CD & Quality Gates** ✅ - GitHub Actions pipeline with automated quality checks and security scanning
 
 ### Security Features
 
@@ -237,13 +247,36 @@ src/test/java/
 - **HTTP Status Codes**: Proper status codes for different error types
 - **Request Logging**: Comprehensive request/response logging
 
+### Quality Assurance
+
+- **Automated CI/CD**: GitHub Actions pipeline running on every push/PR
+- **Code Quality Gates**: Checkstyle, SpotBugs, and JaCoCo coverage enforcement
+- **Security Scanning**: OWASP dependency vulnerability checks
+- **Test Automation**: 134 automated tests with comprehensive coverage
+- **Build Verification**: All quality checks must pass before merge
+
 ## 🚀 Deployment
 
 ### Production Build
 
 ```bash
+# Build with all quality checks
+./mvnw clean verify
+
+# Package for production deployment
 ./mvnw clean package -Pprod
 ```
+
+### CI/CD Pipeline
+
+The project includes a complete GitHub Actions CI/CD pipeline:
+
+- **Automated Testing**: Runs all 134 tests on every push/PR
+- **Quality Gates**: Enforces code coverage (55% line, 70% branch)
+- **Security Checks**: OWASP dependency vulnerability scanning
+- **Code Analysis**: Checkstyle and SpotBugs static analysis
+- **Artifact Generation**: Test reports, coverage reports, and security reports
+- **Branch Protection**: All checks must pass before merging to main
 
 ### Docker (Optional)
 
@@ -281,6 +314,12 @@ src/
 │   ├── java/                   # Test classes (134 tests)
 │   └── resources/
 │       └── application-test.yml # Test configuration
+├── .github/
+│   └── workflows/
+│       └── maven.yml           # CI/CD pipeline configuration
+├── checkstyle.xml              # Code style rules
+├── spotbugs-exclude.xml        # SpotBugs exclusions
+├── owasp-suppressions.xml      # Security scan suppressions
 ```
 
 ## 🤝 Contributing
@@ -288,10 +327,12 @@ src/
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Ensure all tests pass (`./mvnw test`)
-4. Maintain test coverage above 60%
-5. Commit your changes (`git commit -m 'Add some amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+4. Run quality checks (`./mvnw clean verify`)
+5. Maintain test coverage above 55% (line) and 70% (branch)
+6. Ensure code style compliance (Checkstyle and SpotBugs clean)
+7. Commit your changes (`git commit -m 'Add some amazing feature'`)
+8. Push to the branch (`git push origin feature/amazing-feature`)
+9. Open a Pull Request (CI/CD pipeline will automatically run all quality checks)
 
 ## 📝 License
 
@@ -307,12 +348,13 @@ If you encounter any issues or have questions:
 
 ## 🔄 Version History
 
-- **v0.0.1-SNAPSHOT** - Complete implementation with all epics (6-9)
+- **v0.0.1-SNAPSHOT** - Complete implementation with all epics (6-10)
   - ✅ Web Layer (Controllers, DTOs, REST API)
   - ✅ Security & JWT Authentication
   - ✅ Exception Handling & Logging
-  - ✅ Comprehensive Testing Suite (134 tests, 67% coverage)
+  - ✅ Comprehensive Testing Suite (134 tests)
+  - ✅ CI/CD Pipeline & Quality Gates (GitHub Actions, Checkstyle, SpotBugs, OWASP)
 
 ---
 
-**Built with ❤️ using Spring Boot, modern Java technologies, and comprehensive testing practices**
+**Built with ❤️ using Spring Boot, modern Java technologies, comprehensive testing practices, and automated CI/CD quality gates**
