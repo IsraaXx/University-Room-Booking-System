@@ -6,6 +6,7 @@ import com.sprints.room_booking_system.model.UserRole;
 import com.sprints.room_booking_system.repository.UserRepository;
 import com.sprints.room_booking_system.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     
     @Override
     public User createUser(UserDto userDto) {
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
-                .password(userDto.getPassword()) // In production, this should be encrypted
+                .password(passwordEncoder.encode(userDto.getPassword())) // In production, this should be encrypted
                 .role(userDto.getRole())
                 .isActive(true)
                 .build();

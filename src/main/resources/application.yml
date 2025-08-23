@@ -3,3 +3,12 @@ logging:
     root: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId}] %-5level %logger{36} - %msg%n"
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  liquibase:
+    enabled: false
+

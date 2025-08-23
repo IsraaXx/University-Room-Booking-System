@@ -1,4 +1,5 @@
 package com.sprints.room_booking_system.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -44,6 +45,7 @@ public class Booking {
     private Room room;
 
     @OneToMany(mappedBy = "booking")
+    @JsonIgnore
     private List<BookingHistory> history ;
 
     @PrePersist

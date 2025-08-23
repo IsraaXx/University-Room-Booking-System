@@ -1,4 +1,5 @@
 package com.sprints.room_booking_system.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,5 +21,6 @@ public class RoomFeature {
     private String name;
 
     @ManyToMany(mappedBy = "features")
+    @JsonIgnore
     private List<Room> rooms ;
 }

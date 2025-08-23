@@ -28,7 +28,7 @@ public class BookingController {
     }
 
     // Approve booking (admin)
-    @PatchMapping("/<built-in function id>/approve")
+    @PatchMapping("/{id}/approve")
     public ResponseEntity<Booking> approve(@PathVariable("id") Long bookingId,
                                            @RequestParam Long adminUserId) {
         Booking approved = bookingService.approveBooking(bookingId, adminUserId);
@@ -36,7 +36,7 @@ public class BookingController {
     }
 
     // Reject booking (admin)
-    @PatchMapping("/<built-in function id>/reject")
+    @PatchMapping("/{id}/reject")
     public ResponseEntity<Booking> reject(@PathVariable("id") Long bookingId,
                                           @RequestParam Long adminUserId,
                                           @RequestParam String reason) {
@@ -45,7 +45,7 @@ public class BookingController {
     }
 
     // Cancel booking (requester or admin)
-    @DeleteMapping("/<built-in function id>")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Booking> cancel(@PathVariable("id") Long bookingId,
                                           @RequestParam Long userId,
                                           @RequestParam(defaultValue = "false") boolean isAdmin) {

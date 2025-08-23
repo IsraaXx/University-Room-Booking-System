@@ -28,14 +28,14 @@ public class RoomController {
     }
 
     // Admin: update room
-    @PutMapping("/<built-in function id>")
+    @PutMapping("/{id}")
     public ResponseEntity<Room> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDto roomDto) {
         Room updated = roomService.updateRoom(id, roomDto);
         return ResponseEntity.ok(updated);
     }
 
     // Get room by id
-    @GetMapping("/<built-in function id>")
+    @GetMapping("/{id}")
     public ResponseEntity<Room> getRoom(@PathVariable("id") Long id) {
         Optional<Room> room = roomService.findById(id);
         return room.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
@@ -48,7 +48,7 @@ public class RoomController {
     }
 
     // Admin: deactivate (soft delete) room
-    @DeleteMapping("/<built-in function id>")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable("id") Long id) {
         roomService.deactivateRoom(id);
         return ResponseEntity.noContent().build();

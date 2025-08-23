@@ -1,4 +1,5 @@
 package com.sprints.room_booking_system.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -26,5 +27,6 @@ public class Building {
 
     @OneToMany(mappedBy = "building")
     @ToString.Exclude
+    @JsonIgnore
     private List<Room> rooms ;
 }
