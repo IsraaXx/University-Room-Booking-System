@@ -35,6 +35,16 @@ public interface UserService {
     List<User> findAllUsers();
     
     /**
+     * Get all users (alias for findAllUsers)
+     */
+    List<User> getAllUsers();
+    
+    /**
+     * Get user by ID
+     */
+    User getUserById(Long userId);
+    
+    /**
      * Find users by role
      */
     List<User> findUsersByRole(UserRole role);
@@ -48,6 +58,11 @@ public interface UserService {
      * Deactivate user
      */
     void deactivateUser(Long userId);
+    
+    /**
+     * Activate user
+     */
+    void activateUser(Long userId);
     
     /**
      * Check if user exists by email
