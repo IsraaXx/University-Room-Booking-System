@@ -28,11 +28,17 @@ public class NoOverlapValidator implements ConstraintValidator<NoOverlap, Bookin
             return false;
         }
         
-        // Use the repository to check for overlapping bookings
-        return !bookingRepository.hasOverlappingBookings(
-            bookingDto.getRoomId(),
-            bookingDto.getStartTime(),
-            bookingDto.getEndTime()
-        );
+        try {
+            // Use the repository to check for overlapping bookings
+            return !bookingRepository.hasOverlappingBookings(
+                bookingDto.getRoomId(),
+                bookingDto.getStartTime(),
+                bookingDto.getEndTime()
+            );
+        } catch (Exception e) {
+            // If there's any error checking for overlaps, fail validation
+            // This is safer than allowing potentially invalid bookings
+            return false;
+        }
     }
 }

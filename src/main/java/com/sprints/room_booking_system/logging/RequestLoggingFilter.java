@@ -1,4 +1,4 @@
-package com.university.booking.logging;
+package com.sprints.room_booking_system.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

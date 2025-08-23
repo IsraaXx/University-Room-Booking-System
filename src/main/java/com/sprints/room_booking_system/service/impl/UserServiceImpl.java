@@ -97,6 +97,26 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+    public List<User> getAllUsers() {
+        return findAllUsers();
+    }
+    
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+    }
+    
+    @Override
+    public void activateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        
+        user.setIsActive(true);
+        userRepository.save(user);
+    }
+    
+    @Override
     @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);

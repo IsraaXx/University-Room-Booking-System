@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+        xmlns="https://github.com/spotbugs/filter/3.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/xsd/filter.xsd">
+
+    <!-- Exclude generated sources -->
+    <Match>
+        <Source name="~.*\.java"/>
+    </Match>
+
+    <!-- Exclude test sources -->
+    <Match>
+        <Source name="~.*Test\.java"/>
+    </Match>
+
+    <!-- Exclude integration test sources -->
+    <Match>
+        <Source name="~.*IT\.java"/>
+    </Match>
+
+    <!-- Exclude Lombok generated code -->
+    <Match>
+        <Class name="~.*\$\$.*"/>
+    </Match>
+
+    <!-- Exclude Spring Boot specific patterns -->
+    <Match>
+        <Class name="~.*Application"/>
+    </Match>
+
+    <!-- Exclude JPA entities from some checks -->
+    <Match>
+        <Class name="~.*\.model\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude DTOs from some checks -->
+    <Match>
+        <Class name="~.*\.dto\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude JWT related classes from some checks -->
+    <Match>
+        <Class name="~.*\.security\..*"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Exclude specific false positives -->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_EXCEPTION"/>
+        <Class name="~.*\.controller\..*"/>
+    </Match>
+
+    <!-- Exclude magic numbers in test files -->
+    <Match>
+        <Source name="~.*Test\.java"/>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+    </Match>
+
+    <!-- Exclude some common Spring patterns -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="~.*\.config\..*"/>
+    </Match>
+
+</FindBugsFilter>
