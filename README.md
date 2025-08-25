@@ -5,6 +5,22 @@ It supports browsing room availability, booking date/time slots, admin approval 
 
 ---
 
+📌 **About the Project**  
+This project was developed as part of the **Banque Misr Summer Training (Back-End Track)**.  
+It was a **team project** aimed at practicing and strengthening hands-on skills in **Spring Boot** and related technologies.  
+Throughout the project, we applied many core concepts such as:
+- RESTful API design  
+- Authentication & Authorization with JWT  
+- Role-based access control (Student, Faculty, Admin)  
+- DTO validation & exception handling  
+- JPA/Hibernate for database persistence  
+- Unit & Integration testing  
+- Logging & error handling  
+
+The goal was to simulate a real-world backend system while consolidating the knowledge gained during training.
+
+---
+
 ## 👥 Users & Roles
 
 - **Student** → Authenticated user allowed to search availability, request bookings (for student activities), view/cancel own bookings.
@@ -138,5 +154,3 @@ It supports browsing room availability, booking date/time slots, admin approval 
 - Add more controllers (`HolidayController`, `RoomFeatureController`, `DepartmentController`, etc.)  
 - Extend DTOs with request/response validation.  
 - Improve documentation with API examples (using Swagger/OpenAPI).  
-
----
