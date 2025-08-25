@@ -1,5 +1,6 @@
 package com.sprints.room_booking_system.repository;
 
+import com.sprints.room_booking_system.dto.BookingDto;
 import com.sprints.room_booking_system.model.Booking;
 import com.sprints.room_booking_system.model.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,6 +29,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * Find bookings by status
      */
+
     List<Booking> findByStatus(BookingStatus status);
     
     /**
@@ -44,14 +46,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * Find bookings by date range
      */
     @Query("SELECT b FROM Booking b WHERE b.startTime >= :startDate AND b.startTime <= :endDate")
-    List<Booking> findByDateRange(@Param("startDate") LocalDateTime startDate, 
+    List<Booking> findByDateRange(@Param("startDate") LocalDateTime startDate,
                                    @Param("endDate") LocalDateTime endDate);
     
     /**
      * Find bookings by room and date range
      */
     @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId AND b.startTime >= :startDate AND b.startTime <= :endDate")
-    List<Booking> findByRoomAndDateRange(@Param("roomId") Long roomId, 
+    List<Booking> findByRoomAndDateRange(@Param("roomId") Long roomId,
                                          @Param("startDate") LocalDateTime startDate, 
                                          @Param("endDate") LocalDateTime endDate);
     
@@ -62,7 +64,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
         SELECT COUNT(b) > 0 FROM Booking b 
         WHERE b.room.id = :roomId 
-        AND b.status IN ('PENDING', 'APPROVED')
+        AND b.status IN (com.sprints.room_booking_system.model.BookingStatus.PENDING,com.sprints.room_booking_system.model.BookingStatus.APPROVED)
         AND b.id != :excludeBookingId
         AND (
             (b.startTime <= :startTime AND b.endTime > :startTime) OR
@@ -81,7 +83,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("""
         SELECT COUNT(b) > 0 FROM Booking b 
         WHERE b.room.id = :roomId 
-        AND b.status IN ('PENDING', 'APPROVED')
+
+        AND b.status IN (com.sprints.room_booking_system.model.BookingStatus.PENDING,com.sprints.room_booking_system.model.BookingStatus.APPROVED)
         AND (
             (b.startTime <= :startTime AND b.endTime > :startTime) OR
             (b.startTime < :endTime AND b.endTime >= :endTime) OR
@@ -102,7 +105,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * Find active bookings (PENDING or APPROVED)
      */
-    @Query("SELECT b FROM Booking b WHERE b.status IN ('PENDING', 'APPROVED')")
+    @Query("SELECT b FROM Booking b WHERE b.status IN (com.sprints.room_booking_system.model.BookingStatus.PENDING,com.sprints.room_booking_system.model.BookingStatus.APPROVED)")
     List<Booking> findActiveBookings();
     
     /**
@@ -118,7 +121,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             (b.startTime >= :startTime AND b.endTime <= :endTime)
         )
         """)
-    List<Booking> findByRoomAndTimeRange(@Param("roomId") Long roomId, 
+    List<Booking> findByRoomAndTimeRange(@Param("roomId") Long roomId,
                                          @Param("startTime") LocalDateTime startTime, 
                                          @Param("endTime") LocalDateTime endTime);
 }

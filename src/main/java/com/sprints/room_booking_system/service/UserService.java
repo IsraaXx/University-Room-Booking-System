@@ -12,47 +12,47 @@ public interface UserService {
     /**
      * Create a new user
      */
-    User createUser(UserDto userDto);
+    UserDto createUser(UserDto userDto);
     
     /**
      * Update an existing user
      */
-    User updateUser(Long userId, UserDto userDto);
+    UserDto updateUser(Long userId, UserDto userDto);
     
     /**
      * Find user by ID
      */
-    Optional<User> findById(Long userId);
+    Optional<UserDto> findById(Long userId);
     
     /**
      * Find user by email
      */
-    Optional<User> findByEmail(String email);
+    Optional<UserDto> findByEmail(String email);
     
     /**
      * Find all users
      */
-    List<User> findAllUsers();
-    
+    List<UserDto> findAllUsers();
+
     /**
      * Get all users (alias for findAllUsers)
      */
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
     
     /**
      * Get user by ID
      */
-    User getUserById(Long userId);
+    UserDto getUserById(Long userId);
     
     /**
      * Find users by role
      */
-    List<User> findUsersByRole(UserRole role);
+    List<UserDto> findUsersByRole(UserRole role);
     
     /**
      * Find users by department
      */
-    List<User> findUsersByDepartment(Long departmentId);
+    List<UserDto> findUsersByDepartment(Long departmentId);
     
     /**
      * Deactivate user

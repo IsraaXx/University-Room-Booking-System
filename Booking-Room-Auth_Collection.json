@@ -1,0 +1,115 @@
+{
+  "info": {
+    "name": "Room Booking System",
+    "_postman_id": "12345678-abcd-efgh-ijkl-1234567890ab",
+    "description": "Collection for testing Room Booking System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Israa\",\n  \"email\": \"israa@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"ADMIN\",\n  \"departmentId\": 1\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/v1/auth/register", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"israa@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/v1/auth/login", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rooms",
+      "item": [
+        {
+          "name": "Create Room",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Room A\",\n  \"capacity\": 20,\n  \"floorNumber\": 2,\n  \"buildingId\": 1,\n  \"featureIds\": []\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/v1/rooms", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "rooms"] }
+          }
+        },
+        {
+          "name": "List Rooms",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/v1/rooms", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "rooms"] }
+          }
+        },
+        {
+          "name": "Get Room by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/v1/rooms/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "rooms", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Request Booking",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": 1,\n  \"userId\": 1,\n  \"startTime\": \"2025-08-20T10:00:00\",\n  \"endTime\": \"2025-08-20T12:00:00\",\n  \"purpose\": \"Team Meeting\"\n}"
+            },
+            "url": { "raw": "http://localhost:8080/api/v1/bookings?userId=1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "bookings"], "query": [{ "key": "userId", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Approve Booking",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "http://localhost:8080/api/v1/bookings/1/approve?adminUserId=1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "bookings", "1", "approve"], "query": [{ "key": "adminUserId", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Reject Booking",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "http://localhost:8080/api/v1/bookings/1/reject?adminUserId=1&reason=Room not available", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "bookings", "1", "reject"], "query": [{ "key": "adminUserId", "value": "1" }, { "key": "reason", "value": "Room not available" }] }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "http://localhost:8080/api/v1/bookings/1?userId=1&isAdmin=false", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "bookings", "1"], "query": [{ "key": "userId", "value": "1" }, { "key": "isAdmin", "value": "false" }] }
+          }
+        },
+        {
+          "name": "Booking History",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:8080/api/v1/bookings/history/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api", "v1", "bookings", "history", "1"] }
+          }
+        }
+      ]
+    }
+  ]
+}

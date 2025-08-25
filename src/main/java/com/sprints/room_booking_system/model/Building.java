@@ -27,6 +27,5 @@ public class Building {
 
     @OneToMany(mappedBy = "building")
     @ToString.Exclude
-    @JsonIgnore
     private List<Room> rooms ;
 }

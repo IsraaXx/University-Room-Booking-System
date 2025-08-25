@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
     private static final int MAX_BOOKING_WINDOW_DAYS = 90;
     
     @Override
-    public Booking createBooking(BookingDto bookingDto, Long userId) {
+    public BookingDto createBooking(BookingDto bookingDto, Long userId) {
         // Validate booking dates
         validateBookingDates(bookingDto.getStartTime(), bookingDto.getEndTime());
         
@@ -66,17 +67,19 @@ public class BookingServiceImpl implements BookingService {
                 .status(BookingStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
+        // Create booking with PENDING status
+
         
         Booking savedBooking = bookingRepository.save(booking);
         
         // Log booking creation
         logBookingHistory(savedBooking, "CREATED", "Booking created", user);
         
-        return savedBooking;
+        return toDto(savedBooking);
     }
     
     @Override
-    public Booking updateBooking(Long bookingId, BookingDto bookingDto, Long userId) {
+    public BookingDto updateBooking(Long bookingId, BookingDto bookingDto, Long userId) {
         Booking existingBooking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
         
@@ -112,142 +115,141 @@ public class BookingServiceImpl implements BookingService {
         // Log booking update
         logBookingHistory(updatedBooking, "UPDATED", "Booking updated", userRepository.findById(userId).orElse(null));
         
-        return updatedBooking;
+        return toDto(updatedBooking);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Booking> findById(Long bookingId) {
-        return bookingRepository.findById(bookingId);
+    public Optional<BookingDto> findById(Long bookingId) {
+        return bookingRepository.findById(bookingId).map(this::toDto);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Booking> findAllBookings() {
-        return bookingRepository.findAll();
+    public List<BookingDto> findAllBookings() {
+        List<Booking> bookings = bookingRepository.findAll();
+        return bookings.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Booking> findBookingsByUser(Long userId) {
-        return bookingRepository.findByUserId(userId);
+    public List<BookingDto> findBookingsByUser(Long userId) {
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
+        return bookings.stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Booking> findBookingsByRoom(Long roomId) {
-        return bookingRepository.findByRoomId(roomId);
+    public List<BookingDto> findBookingsByRoom(Long roomId) {
+        List<Booking> bookings = bookingRepository.findByRoomId(roomId);
+        return bookings.stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Booking> findBookingsByStatus(BookingStatus status) {
-        return bookingRepository.findByStatus(status);
+    public List<BookingDto> findBookingsByStatus(BookingStatus status) {
+        List<Booking> bookings = bookingRepository.findByStatus(status);
+        return bookings.stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Booking> findBookingsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return bookingRepository.findByDateRange(startDate, endDate);
+    public List<BookingDto> findBookingsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        List<Booking> bookings = bookingRepository.findByDateRange(startDate, endDate);
+        return bookings.stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
-    public Booking approveBooking(Long bookingId, Long adminUserId) {
+    public BookingDto approveBooking(Long bookingId, Long adminUserId) {
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
-        
-        // Check if user is admin
+
         if (admin.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedOperationException("Only admins can approve bookings");
         }
-        
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
-        
-        // Check if booking can be approved
+
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new IllegalArgumentException("Only PENDING bookings can be approved");
         }
-        
-        // Check if room is still available
-        if (!isRoomAvailable(booking.getRoom().getId(), booking.getStartTime(), booking.getEndTime())) {
+
+         boolean conflict = bookingRepository.hasOverlappingBookings(
+                booking.getRoom().getId(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                booking.getId()
+        );
+
+        if (conflict) {
             throw new BookingConflictException("Room is no longer available for the specified time period");
         }
-        
-        // Approve booking
+
         booking.setStatus(BookingStatus.APPROVED);
         Booking approvedBooking = bookingRepository.save(booking);
-        
-        // Log approval
+
         logBookingHistory(approvedBooking, "APPROVED", "Booking approved by admin", admin);
-        
-        return approvedBooking;
+
+        return toDto(approvedBooking);
     }
     
     @Override
-    public Booking rejectBooking(Long bookingId, Long adminUserId, String reason) {
+    public BookingDto rejectBooking(Long bookingId, Long adminUserId, String reason) {
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
-        
-        // Check if user is admin
+
         if (admin.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedOperationException("Only admins can reject bookings");
         }
-        
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
-        
-        // Check if booking can be rejected
+
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new IllegalArgumentException("Only PENDING bookings can be rejected");
         }
-        
-        // Reject booking
+
         booking.setStatus(BookingStatus.REJECTED);
         Booking rejectedBooking = bookingRepository.save(booking);
-        
-        // Log rejection
+
         logBookingHistory(rejectedBooking, "REJECTED", "Booking rejected: " + reason, admin);
-        
-        return rejectedBooking;
+
+        return toDto(rejectedBooking);
     }
-    
     @Override
-    public Booking cancelBooking(Long bookingId, Long userId, boolean isAdmin) {
+    public BookingDto cancelBooking(Long bookingId, Long userId, boolean isAdmin) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found with ID: " + bookingId));
-        
-        // Check if user can cancel this booking
+
         if (!isAdmin && !booking.getUser().getId().equals(userId)) {
             throw new UnauthorizedOperationException("User can only cancel their own bookings");
         }
-        
-        // Check if booking can be cancelled
-        if (booking.getStatus() == BookingStatus.CANCELLED || 
-            booking.getStatus() == BookingStatus.REJECTED) {
+
+        if (booking.getStatus() == BookingStatus.CANCELLED ||
+                booking.getStatus() == BookingStatus.REJECTED) {
             throw new IllegalArgumentException("Booking cannot be cancelled in current status: " + booking.getStatus());
         }
-        
-        // Regular users can only cancel before start time
+
         if (!isAdmin && LocalDateTime.now().isAfter(booking.getStartTime())) {
             throw new UnauthorizedOperationException("Cannot cancel booking after start time");
         }
-        
-        // Cancel booking
+
         booking.setStatus(BookingStatus.CANCELLED);
         Booking cancelledBooking = bookingRepository.save(booking);
-        
-        // Log cancellation
-        String action = isAdmin ? "CANCELLED_BY_ADMIN" : "CANCELLED";
+
+        String action = "CANCELLED";
         String message = isAdmin ? "Booking cancelled by admin" : "Booking cancelled by user";
         logBookingHistory(cancelledBooking, action, message, user);
-        
-        return cancelledBooking;
+        return toDto(cancelledBooking);
     }
-    
+
+
     @Override
     @Transactional(readOnly = true)
     public boolean isRoomAvailable(Long roomId, LocalDateTime startTime, LocalDateTime endTime) {
@@ -257,13 +259,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public List<Object> getBookingHistory(Long bookingId) {
-        return bookingHistoryRepository.findByBookingId(bookingId)
-                .stream()
+        List<BookingHistory> historyList = bookingHistoryRepository.findByBookingId(bookingId);
+
+        return historyList.stream()
                 .map(history -> Map.of(
-                    "action", history.getAction(),
-                    "actionTime", history.getActionTime(),
-                    "reason", history.getReason(),
-                    "user", history.getUser().getName()
+                        "action", history.getAction(),
+                        "actionTime", history.getActionTime(),
+                        "reason", history.getReason(),
+                        "user", history.getUser().getName()
                 ))
                 .collect(Collectors.toList());
     }
@@ -315,5 +318,19 @@ public class BookingServiceImpl implements BookingService {
                 .build();
         
         bookingHistoryRepository.save(history);
+    }
+
+
+    public BookingDto toDto(Booking booking){
+        BookingDto bookingdto = BookingDto.builder()
+                .roomId(booking.getRoom().getId())
+                .userId(booking.getUser().getId())
+                .startTime(booking.getStartTime())
+                .endTime(booking.getEndTime())
+                .purpose(booking.getPurpose())
+                .status(booking.getStatus())
+                .build();
+
+        return bookingdto;
     }
 }

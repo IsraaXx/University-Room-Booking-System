@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class BuildingDto {
-    private Long id;       // هيفيد في الـ update أو response
+    private Long id;
     private String name;
     private String location;
 }

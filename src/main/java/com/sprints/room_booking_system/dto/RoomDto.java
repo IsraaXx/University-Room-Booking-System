@@ -31,6 +31,8 @@ public class RoomDto {
     
     @NotNull(message = "Building ID is required")
     private Long buildingId;
-    
+
+
     private List<Long> featureIds;
+    private Boolean isActive;
 }

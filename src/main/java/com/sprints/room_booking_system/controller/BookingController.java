@@ -23,38 +23,38 @@ public class BookingController {
     // Request a booking
     @PostMapping
     @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
-    public ResponseEntity<Booking> requestBooking(@Valid @RequestBody BookingDto bookingDto,
+    public ResponseEntity<BookingDto> requestBooking(@Valid @RequestBody BookingDto bookingDto,
                                                   @RequestParam Long userId) {
-        Booking created = bookingService.createBooking(bookingDto, userId);
+        BookingDto created = bookingService.createBooking(bookingDto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Approve booking (admin)
     @PatchMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Booking> approve(@PathVariable("id") Long bookingId,
+    public ResponseEntity<BookingDto> approve(@PathVariable("id") Long bookingId,
                                            @RequestParam Long adminUserId) {
-        Booking approved = bookingService.approveBooking(bookingId, adminUserId);
+        BookingDto approved = bookingService.approveBooking(bookingId, adminUserId);
         return ResponseEntity.ok(approved);
     }
 
     // Reject booking (admin)
     @PatchMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Booking> reject(@PathVariable("id") Long bookingId,
+    public ResponseEntity<BookingDto> reject(@PathVariable("id") Long bookingId,
                                           @RequestParam Long adminUserId,
                                           @RequestParam String reason) {
-        Booking rejected = bookingService.rejectBooking(bookingId, adminUserId, reason);
+        BookingDto rejected = bookingService.rejectBooking(bookingId, adminUserId, reason);
         return ResponseEntity.ok(rejected);
     }
 
     // Cancel booking (requester or admin)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('STUDENT', 'FACULTY', 'ADMIN')")
-    public ResponseEntity<Booking> cancel(@PathVariable("id") Long bookingId,
+    public ResponseEntity<BookingDto> cancel(@PathVariable("id") Long bookingId,
                                           @RequestParam Long userId,
                                           @RequestParam(defaultValue = "false") boolean isAdmin) {
-        Booking canceled = bookingService.cancelBooking(bookingId, userId, isAdmin);
+        BookingDto canceled = bookingService.cancelBooking(bookingId, userId, isAdmin);
         return ResponseEntity.ok(canceled);
     }
 

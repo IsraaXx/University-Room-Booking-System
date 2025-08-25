@@ -45,7 +45,6 @@ public class Booking {
     private Room room;
 
     @OneToMany(mappedBy = "booking")
-    @JsonIgnore
     private List<BookingHistory> history ;
 
     @PrePersist

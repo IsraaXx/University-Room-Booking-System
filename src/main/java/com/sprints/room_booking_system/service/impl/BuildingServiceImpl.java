@@ -4,10 +4,13 @@ import com.sprints.room_booking_system.dto.BuildingDto;
 import com.sprints.room_booking_system.model.Building;
 import com.sprints.room_booking_system.repository.BuildingRepository;
 import com.sprints.room_booking_system.service.BuildingService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,46 +19,74 @@ public class BuildingServiceImpl implements BuildingService {
     private final BuildingRepository buildingRepository;
 
     @Override
-    public Building createBuilding(BuildingDto buildingDto) {
+    public BuildingDto createBuilding(BuildingDto buildingDto) {
         if (buildingRepository.existsByName(buildingDto.getName())) {
             throw new IllegalArgumentException("Building with name " + buildingDto.getName() + " already exists");
         }
 
+        // Convert DTO to Entity
         Building building = Building.builder()
                 .name(buildingDto.getName())
                 .location(buildingDto.getLocation())
                 .build();
 
-        return buildingRepository.save(building);
+        Building savedBuilding = buildingRepository.save(building);
+
+        // Convert the saved Entity back to DTO before returning
+        return toDto(savedBuilding);
     }
 
-    @Override
-    public Building updateBuilding(Long id, BuildingDto buildingDto) {
-        Building building = buildingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Building not found with id " + id));
 
-        building.setName(buildingDto.getName());
-        building.setLocation(buildingDto.getLocation());
+        @Override
+        public BuildingDto updateBuilding(Long id, BuildingDto buildingDto) {
+            Building existingBuilding = buildingRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Building not found with id " + id));
 
-        return buildingRepository.save(building);
-    }
+            // Check if name is being changed and if the new name already exists
+            if (!existingBuilding.getName().equals(buildingDto.getName()) &&
+                    buildingRepository.existsByName(buildingDto.getName())) {
+                throw new IllegalArgumentException("Building with name " + buildingDto.getName() + " already exists");
+            }
 
-    @Override
-    public void deleteBuilding(Long id) {
-        if (!buildingRepository.existsById(id)) {
-            throw new RuntimeException("Building not found with id " + id);
+            // Update the existing entity with new data from DTO
+            existingBuilding.setName(buildingDto.getName());
+            existingBuilding.setLocation(buildingDto.getLocation());
+
+            Building updatedBuilding = buildingRepository.save(existingBuilding);
+
+            // Convert the updated Entity back to DTO
+            return toDto(updatedBuilding);
         }
-        buildingRepository.deleteById(id);
-    }
 
     @Override
-    public Building getBuildingById(Long id) {
+    @Transactional
+        public void deleteBuilding(Long id) {
+            if (!buildingRepository.existsById(id)) {
+                throw new IllegalArgumentException("Building not found with id " + id);
+            }
+            buildingRepository.deleteById(id);
+        }
+
+    @Override
+    @Transactional
+    public Optional<BuildingDto> getBuildingById(Long id) {
         return buildingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Building not found with id " + id));
+                .map(this::toDto); // Convert the Entity to a DTO
     }
 
     @Override
-    public List<Building> getAllBuildings() {
-        return buildingRepository.findAll();
+    @Transactional
+    public List<BuildingDto> getAllBuildings() {
+        return buildingRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private BuildingDto toDto(Building building) {
+        return BuildingDto.builder()
+                .id(building.getId())
+                .name(building.getName())
+                .location(building.getLocation())
+                .build();
     }
 }

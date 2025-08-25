@@ -29,4 +29,5 @@ public class UserDto {
     private UserRole role;
     
     private Long departmentId;
+    private Boolean isActive = true;
 }

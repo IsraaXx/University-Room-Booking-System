@@ -1,6 +1,7 @@
 package com.sprints.room_booking_system.service.impl;
 
 import com.sprints.room_booking_system.dto.RoomDto;
+import com.sprints.room_booking_system.model.Building;
 import com.sprints.room_booking_system.model.Room;
 import com.sprints.room_booking_system.model.RoomFeature;
 import com.sprints.room_booking_system.repository.BuildingRepository;
@@ -28,104 +29,101 @@ public class RoomServiceImpl implements RoomService {
     private final BookingRepository bookingRepository;
     
     @Override
-    public Room createRoom(RoomDto roomDto) {
-        // Verify building exists
-        if (!buildingRepository.existsById(roomDto.getBuildingId())) {
-            throw new IllegalArgumentException("Building not found with ID: " + roomDto.getBuildingId());
-        }
-        
+    public RoomDto createRoom(RoomDto roomDto) {
+        // Find Building
+        Building building = buildingRepository.findById(roomDto.getBuildingId())
+                .orElseThrow(() -> new IllegalArgumentException("Building not found with ID: " + roomDto.getBuildingId()));
+
+        // Set features if provided
+        List<RoomFeature> features = roomDto.getFeatureIds() != null && !roomDto.getFeatureIds().isEmpty()
+                ? roomFeatureRepository.findByIdIn(roomDto.getFeatureIds())
+                : null;
+
+
         Room room = Room.builder()
                 .name(roomDto.getName())
                 .capacity(roomDto.getCapacity())
                 .floorNumber(roomDto.getFloorNumber())
                 .isActive(true)
+                .building(building)
+                .features(features)
                 .build();
-        
-        // Set building
-        room.setBuilding(buildingRepository.findById(roomDto.getBuildingId()).orElse(null));
-        
-        // Set features if provided
-        if (roomDto.getFeatureIds() != null && !roomDto.getFeatureIds().isEmpty()) {
-            List<RoomFeature> features = roomFeatureRepository.findByIdIn(roomDto.getFeatureIds());
-            room.setFeatures(features);
-        }
-        
-        return roomRepository.save(room);
+
+        Room savedRoom = roomRepository.save(room);
+        return toDto(savedRoom);
     }
     
     @Override
-    public Room updateRoom(Long roomId, RoomDto roomDto) {
+    public RoomDto updateRoom(Long roomId, RoomDto roomDto) {
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found with ID: " + roomId));
-        
-        // Verify building exists if being changed
-        if (!roomDto.getBuildingId().equals(existingRoom.getBuilding().getId()) && 
-            !buildingRepository.existsById(roomDto.getBuildingId())) {
-            throw new IllegalArgumentException("Building not found with ID: " + roomDto.getBuildingId());
+
+        // Find Building if it's being changed
+        Building newBuilding = existingRoom.getBuilding();
+        if (!roomDto.getBuildingId().equals(existingRoom.getBuilding().getId())) {
+            newBuilding = buildingRepository.findById(roomDto.getBuildingId())
+                    .orElseThrow(() -> new IllegalArgumentException("Building not found with ID: " + roomDto.getBuildingId()));
         }
-        
+
         existingRoom.setName(roomDto.getName());
         existingRoom.setCapacity(roomDto.getCapacity());
         existingRoom.setFloorNumber(roomDto.getFloorNumber());
-        
-        // Update building if changed
-        if (!roomDto.getBuildingId().equals(existingRoom.getBuilding().getId())) {
-            existingRoom.setBuilding(buildingRepository.findById(roomDto.getBuildingId()).orElse(null));
-        }
-        
+        existingRoom.setBuilding(newBuilding);
+
         // Update features if provided
         if (roomDto.getFeatureIds() != null) {
             List<RoomFeature> features = roomFeatureRepository.findByIdIn(roomDto.getFeatureIds());
             existingRoom.setFeatures(features);
         }
-        
-        return roomRepository.save(existingRoom);
+
+        Room updatedRoom = roomRepository.save(existingRoom);
+        return toDto(updatedRoom);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Room> findById(Long roomId) {
-        return roomRepository.findById(roomId);
+    public Optional<RoomDto> findById(Long roomId) {
+        return roomRepository.findById(roomId).map(this::toDto);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<Room> findByName(String name) {
-        return roomRepository.findByName(name);
+    public Optional<RoomDto> findByName(String name) {
+        return roomRepository.findByName(name).map(this::toDto);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Room> findAllRooms() {
-        return roomRepository.findByIsActiveTrue();
+    public List<RoomDto> findAllRooms() {
+        return roomRepository.findByIsActiveTrue().stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Room> findRoomsByBuilding(Long buildingId) {
-        return roomRepository.findByBuildingId(buildingId);
+    public List<RoomDto> findRoomsByBuilding(Long buildingId) {
+        return roomRepository.findByBuildingId(buildingId).stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Room> findRoomsByCapacity(int minCapacity) {
-        return roomRepository.findByCapacityGreaterThanEqual(minCapacity);
+    public List<RoomDto> findRoomsByCapacity(int minCapacity) {
+        return roomRepository.findByCapacityGreaterThanEqual(minCapacity).stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Room> findAvailableRooms(LocalDateTime startTime, LocalDateTime endTime) {
-        return roomRepository.findAvailableRooms(startTime, endTime);
+    public List<RoomDto> findAvailableRooms(LocalDateTime startTime, LocalDateTime endTime) {
+        return roomRepository.findAvailableRooms(startTime, endTime).stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Room> findAvailableRoomsWithFeatures(LocalDateTime startTime, LocalDateTime endTime, List<Long> featureIds) {
+    public List<RoomDto> findAvailableRoomsWithFeatures(LocalDateTime startTime, LocalDateTime endTime, List<Long> featureIds) {
         if (featureIds == null || featureIds.isEmpty()) {
             return findAvailableRooms(startTime, endTime);
         }
-        
-        return roomRepository.findAvailableRoomsWithFeatures(startTime, endTime, featureIds);
+
+        return roomRepository.findAvailableRoomsWithFeatures(startTime, endTime, featureIds).stream().map(this::toDto).collect(Collectors.toList());
     }
     
     @Override
@@ -148,5 +146,16 @@ public class RoomServiceImpl implements RoomService {
         
         // Check for overlapping bookings using the repository's overlap detection
         return !bookingRepository.hasOverlappingBookings(roomId, startTime, endTime);
+    }
+
+    private RoomDto toDto(Room room) {
+        return RoomDto.builder()
+                .name(room.getName())
+                .capacity(room.getCapacity())
+                .floorNumber(room.getFloorNumber())
+                .isActive(room.getIsActive())
+                .buildingId(room.getBuilding().getId())
+                .featureIds(room.getFeatures().stream().map(RoomFeature::getId).collect(Collectors.toList()))
+                .build();
     }
 }

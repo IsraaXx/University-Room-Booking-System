@@ -13,57 +13,57 @@ public interface BookingService {
     /**
      * Create a new booking with business rule validation
      */
-    Booking createBooking(BookingDto bookingDto, Long userId);
+    BookingDto createBooking(BookingDto bookingDto, Long userId);
     
     /**
      * Update an existing booking
      */
-    Booking updateBooking(Long bookingId, BookingDto bookingDto, Long userId);
+    BookingDto updateBooking(Long bookingId, BookingDto bookingDto, Long userId);
     
     /**
      * Find booking by ID
      */
-    Optional<Booking> findById(Long bookingId);
+    Optional<BookingDto> findById(Long bookingId);
     
     /**
      * Find all bookings
      */
-    List<Booking> findAllBookings();
+    List<BookingDto> findAllBookings();
     
     /**
      * Find bookings by user
      */
-    List<Booking> findBookingsByUser(Long userId);
+    List<BookingDto> findBookingsByUser(Long userId);
     
     /**
      * Find bookings by room
      */
-    List<Booking> findBookingsByRoom(Long roomId);
+    List<BookingDto> findBookingsByRoom(Long roomId);
     
     /**
      * Find bookings by status
      */
-    List<Booking> findBookingsByStatus(BookingStatus status);
+    List<BookingDto> findBookingsByStatus(BookingStatus status);
     
     /**
      * Find bookings by date range
      */
-    List<Booking> findBookingsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    List<BookingDto> findBookingsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     
     /**
      * Approve a pending booking (Admin only)
      */
-    Booking approveBooking(Long bookingId, Long adminUserId);
+    BookingDto approveBooking(Long bookingId, Long adminUserId);
     
     /**
      * Reject a pending booking (Admin only)
      */
-    Booking rejectBooking(Long bookingId, Long adminUserId, String reason);
+    BookingDto rejectBooking(Long bookingId, Long adminUserId, String reason);
     
     /**
      * Cancel a booking (User can cancel their own, Admin can cancel any)
      */
-    Booking cancelBooking(Long bookingId, Long userId, boolean isAdmin);
+    BookingDto cancelBooking(Long bookingId, Long userId, boolean isAdmin);
     
     /**
      * Check if a room is available for a time period

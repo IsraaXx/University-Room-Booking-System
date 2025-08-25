@@ -91,15 +91,15 @@ class RoomServiceTest {
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         
         // When
-        Room createdRoom = roomService.createRoom(roomDto);
+        RoomDto createdRoom = roomService.createRoom(roomDto);
         
         // Then
         assertThat(createdRoom).isNotNull();
         assertThat(createdRoom.getName()).isEqualTo("Room 101");
         assertThat(createdRoom.getCapacity()).isEqualTo(25);
         assertThat(createdRoom.getFloorNumber()).isEqualTo(1);
-        assertThat(createdRoom.getBuilding()).isEqualTo(building);
-        assertThat(createdRoom.getFeatures()).hasSize(1);
+        assertThat(createdRoom.getBuildingId()).isEqualTo(building);
+        assertThat(createdRoom.getFeatureIds()).hasSize(1);
         assertThat(createdRoom.getIsActive()).isTrue();
         
         verify(buildingRepository).existsById(1L);
@@ -137,7 +137,7 @@ class RoomServiceTest {
         when(roomRepository.save(any(Room.class))).thenReturn(room);
         
         // When
-        Room createdRoom = roomService.createRoom(roomDtoNoFeatures);
+        RoomDto createdRoom = roomService.createRoom(roomDtoNoFeatures);
         
         // Then
         assertThat(createdRoom).isNotNull();
@@ -172,7 +172,7 @@ class RoomServiceTest {
         when(roomRepository.save(any(Room.class))).thenReturn(existingRoom);
         
         // When
-        Room updatedRoom = roomService.updateRoom(1L, updateDto);
+        RoomDto updatedRoom = roomService.updateRoom(1L, updateDto);
         
         // Then
         assertThat(updatedRoom).isNotNull();
@@ -237,7 +237,7 @@ class RoomServiceTest {
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
         
         // When
-        Optional<Room> foundRoom = roomService.findById(1L);
+        Optional<RoomDto> foundRoom = roomService.findById(1L);
         
         // Then
         assertThat(foundRoom).isPresent();
@@ -251,7 +251,7 @@ class RoomServiceTest {
         when(roomRepository.findById(1L)).thenReturn(Optional.empty());
         
         // When
-        Optional<Room> foundRoom = roomService.findById(1L);
+        Optional<RoomDto> foundRoom = roomService.findById(1L);
         
         // Then
         assertThat(foundRoom).isEmpty();
@@ -264,7 +264,7 @@ class RoomServiceTest {
         when(roomRepository.findByName("Room 101")).thenReturn(Optional.of(room));
         
         // When
-        Optional<Room> foundRoom = roomService.findByName("Room 101");
+        Optional<RoomDto> foundRoom = roomService.findByName("Room 101");
         
         // Then
         assertThat(foundRoom).isPresent();
@@ -279,7 +279,7 @@ class RoomServiceTest {
         when(roomRepository.findByIsActiveTrue()).thenReturn(rooms);
         
         // When
-        List<Room> allRooms = roomService.findAllRooms();
+        List<RoomDto> allRooms = roomService.findAllRooms();
         
         // Then
         assertThat(allRooms).hasSize(1);
@@ -294,7 +294,7 @@ class RoomServiceTest {
         when(roomRepository.findByBuildingId(1L)).thenReturn(buildingRooms);
         
         // When
-        List<Room> roomsByBuilding = roomService.findRoomsByBuilding(1L);
+        List<RoomDto> roomsByBuilding = roomService.findRoomsByBuilding(1L);
         
         // Then
         assertThat(roomsByBuilding).hasSize(1);
@@ -308,7 +308,7 @@ class RoomServiceTest {
         when(roomRepository.findByCapacityGreaterThanEqual(20)).thenReturn(capacityRooms);
         
         // When
-        List<Room> roomsByCapacity = roomService.findRoomsByCapacity(20);
+        List<RoomDto> roomsByCapacity = roomService.findRoomsByCapacity(20);
         
         // Then
         assertThat(roomsByCapacity).hasSize(1);
@@ -325,7 +325,7 @@ class RoomServiceTest {
         when(roomRepository.findAvailableRooms(startTime, endTime)).thenReturn(availableRooms);
         
         // When
-        List<Room> available = roomService.findAvailableRooms(startTime, endTime);
+        List<RoomDto> available = roomService.findAvailableRooms(startTime, endTime);
         
         // Then
         assertThat(available).hasSize(1);
@@ -343,7 +343,7 @@ class RoomServiceTest {
         when(roomRepository.findAvailableRoomsWithFeatures(startTime, endTime, featureIds)).thenReturn(availableRooms);
         
         // When
-        List<Room> available = roomService.findAvailableRoomsWithFeatures(startTime, endTime, featureIds);
+        List<RoomDto> available = roomService.findAvailableRoomsWithFeatures(startTime, endTime, featureIds);
         
         // Then
         assertThat(available).hasSize(1);
@@ -360,7 +360,7 @@ class RoomServiceTest {
         when(roomRepository.findAvailableRooms(startTime, endTime)).thenReturn(availableRooms);
         
         // When
-        List<Room> available = roomService.findAvailableRoomsWithFeatures(startTime, endTime, null);
+        List<RoomDto> available = roomService.findAvailableRoomsWithFeatures(startTime, endTime, null);
         
         // Then
         assertThat(available).hasSize(1);

@@ -1,10 +1,8 @@
 package com.sprints.room_booking_system.controller;
-
 import com.sprints.room_booking_system.dto.UserDto;
 import com.sprints.room_booking_system.dto.auth.AuthLoginRequest;
 import com.sprints.room_booking_system.dto.auth.AuthRegisterRequest;
 import com.sprints.room_booking_system.dto.auth.AuthResponse;
-import com.sprints.room_booking_system.model.User;
 import com.sprints.room_booking_system.security.AuthService;
 import com.sprints.room_booking_system.service.UserService;
 import jakarta.validation.Valid;
@@ -21,7 +19,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody AuthRegisterRequest request) {
+    public ResponseEntity<UserDto> register(@Valid @RequestBody AuthRegisterRequest request) {
         UserDto dto = UserDto.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -29,7 +27,7 @@ public class AuthController {
                 .role(request.getRole())
                 .departmentId(request.getDepartmentId())
                 .build();
-        User created = userService.createUser(dto);
+        UserDto created = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

@@ -46,6 +46,12 @@ public class SecurityConfig {
                     // Booking approvals admin-only
                     .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/bookings/*/approve").hasRole("ADMIN")
                     .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/bookings/*/reject").hasRole("ADMIN")
+                    // Building endpoints: POST/PUT/DELETE admin-only, GET authenticated
+                    .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/buildings/**").hasRole("ADMIN")
+                    .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/buildings/**").hasRole("ADMIN")
+                    .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/v1/buildings/**").hasRole("ADMIN")
+                    .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/buildings/**").authenticated()
+
                     // Everything else requires authentication
                     .anyRequest().authenticated()
             )

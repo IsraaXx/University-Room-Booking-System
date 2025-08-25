@@ -69,7 +69,7 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         
         // When
-        User createdUser = userService.createUser(userDto);
+        UserDto createdUser = userService.createUser(userDto);
         
         // Then
         assertThat(createdUser).isNotNull();
@@ -121,7 +121,7 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(existingUser);
         
         // When
-        User updatedUser = userService.updateUser(1L, updateDto);
+        UserDto updatedUser = userService.updateUser(1L, updateDto);
         
         // Then
         assertThat(updatedUser).isNotNull();
@@ -183,7 +183,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         
         // When
-        Optional<User> foundUser = userService.findById(1L);
+        Optional<UserDto> foundUser = userService.findById(1L);
         
         // Then
         assertThat(foundUser).isPresent();
@@ -197,7 +197,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         
         // When
-        Optional<User> foundUser = userService.findById(1L);
+        Optional<UserDto> foundUser = userService.findById(1L);
         
         // Then
         assertThat(foundUser).isEmpty();
@@ -210,7 +210,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.of(user));
         
         // When
-        Optional<User> foundUser = userService.findByEmail("john.doe@example.com");
+        Optional<UserDto> foundUser = userService.findByEmail("john.doe@example.com");
         
         // Then
         assertThat(foundUser).isPresent();
@@ -225,7 +225,7 @@ class UserServiceTest {
         when(userRepository.findActiveUsers()).thenReturn(users);
         
         // When
-        List<User> allUsers = userService.findAllUsers();
+        List<UserDto> allUsers = userService.findAllUsers();
         
         // Then
         assertThat(allUsers).hasSize(1);
@@ -240,7 +240,7 @@ class UserServiceTest {
         when(userRepository.findByRole(UserRole.STUDENT)).thenReturn(students);
         
         // When
-        List<User> usersByRole = userService.findUsersByRole(UserRole.STUDENT);
+        List<UserDto> usersByRole = userService.findUsersByRole(UserRole.STUDENT);
         
         // Then
         assertThat(usersByRole).hasSize(1);
@@ -255,7 +255,7 @@ class UserServiceTest {
         when(userRepository.findByDepartmentId(1L)).thenReturn(departmentUsers);
         
         // When
-        List<User> usersByDepartment = userService.findUsersByDepartment(1L);
+        List<UserDto> usersByDepartment = userService.findUsersByDepartment(1L);
         
         // Then
         assertThat(usersByDepartment).hasSize(1);

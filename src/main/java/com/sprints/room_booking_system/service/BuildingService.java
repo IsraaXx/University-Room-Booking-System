@@ -4,11 +4,12 @@ import com.sprints.room_booking_system.dto.BuildingDto;
 import com.sprints.room_booking_system.model.Building;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BuildingService {
-    Building createBuilding(BuildingDto buildingDto);
-    Building updateBuilding(Long id, BuildingDto buildingDto);
+    BuildingDto createBuilding(BuildingDto buildingDto);
+    BuildingDto updateBuilding(Long id, BuildingDto buildingDto);
     void deleteBuilding(Long id);
-    Building getBuildingById(Long id);
-    List<Building> getAllBuildings();
+    Optional<BuildingDto> getBuildingById(Long id);
+    List<BuildingDto> getAllBuildings();
 }

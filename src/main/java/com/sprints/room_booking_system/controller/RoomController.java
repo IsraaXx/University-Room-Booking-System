@@ -24,29 +24,29 @@ public class RoomController {
     // Admin: create room
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Room> createRoom(@Valid @RequestBody RoomDto roomDto) {
-        Room created = roomService.createRoom(roomDto);
+    public ResponseEntity<RoomDto> createRoom(@Valid @RequestBody RoomDto roomDto) {
+        RoomDto created = roomService.createRoom(roomDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Admin: update room
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Room> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDto roomDto) {
-        Room updated = roomService.updateRoom(id, roomDto);
+    public ResponseEntity<RoomDto> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDto roomDto) {
+        RoomDto updated = roomService.updateRoom(id, roomDto);
         return ResponseEntity.ok(updated);
     }
 
     // Get room by id
     @GetMapping("/{id}")
-    public ResponseEntity<Room> getRoom(@PathVariable("id") Long id) {
-        Optional<Room> room = roomService.findById(id);
+    public ResponseEntity<RoomDto> getRoom(@PathVariable("id") Long id) {
+        Optional<RoomDto> room = roomService.findById(id);
         return room.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // List rooms
     @GetMapping
-    public ResponseEntity<List<Room>> listRooms() {
+    public ResponseEntity<List<RoomDto>> listRooms() {
         return ResponseEntity.ok(roomService.findAllRooms());
     }
 

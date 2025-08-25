@@ -41,12 +41,10 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    @JsonIgnore
     private List<Booking> bookings ;
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    @JsonIgnore
     private List<BookingHistory> bookingHistories ;
 
     @Column(nullable = false)

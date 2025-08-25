@@ -21,6 +21,5 @@ public class RoomFeature {
     private String name;
 
     @ManyToMany(mappedBy = "features")
-    @JsonIgnore
     private List<Room> rooms ;
 }

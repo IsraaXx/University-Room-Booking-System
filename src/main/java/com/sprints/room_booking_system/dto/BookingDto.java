@@ -1,5 +1,6 @@
 package com.sprints.room_booking_system.dto;
 
+import com.sprints.room_booking_system.model.BookingStatus;
 import com.sprints.room_booking_system.validation.NoOverlap;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -35,4 +36,6 @@ public class BookingDto {
     
     @NotBlank(message = "Purpose is required")
     private String purpose;
+
+    private BookingStatus status;
 }
